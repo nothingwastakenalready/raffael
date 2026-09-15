@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "raffael"
-version = "0.4.0"
+version = "0.6.0"
 description = "small service checks for things i run"
 requires-python = ">=3.11"
 dependencies = [

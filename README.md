@@ -34,6 +34,20 @@ docs/getting-started.md
 that guide explains docker, `.env`, the first account, mailpit and the first
 sensor without assuming you already know the weird corners of this repo.
 
+there is also a small installer:
+
+```bash
+./scripts/install.sh
+```
+
+windows:
+
+```powershell
+.\scripts\install.ps1
+```
+
+details are in `docs/installer.md`.
+
 config reference:
 
 ```text

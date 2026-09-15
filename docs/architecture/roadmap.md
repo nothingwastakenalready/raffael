@@ -75,7 +75,7 @@ exit criteria:
 
 goal: answer `what changed?` rather than only `what is true right now?`.
 
-progress: the first v0.4 slice now stores scheduled measurements in sqlite through sqlalchemy, ships an initial alembic migration and exposes bounded utc time-range history. State-change events, retention and uptime calculation remain.
+progress: v0.4 is effectively complete: scheduled measurements persist in sqlite through sqlalchemy, migrations exist, bounded utc history is exposed and the dashboard derives latency, uptime and downtime from recent samples. state-change events and retention are still future polish.
 
 scope:
 

@@ -368,7 +368,7 @@ export function Dashboard({ states, selectedKey, onSelect }: DashboardProps) {
         <div className="rail-line" />
         <div className="rail-item rail-item-active" aria-hidden="true">01</div>
         <div className="rail-spacer" />
-        <div className="rail-version">0.4</div>
+        <div className="rail-version">0.6</div>
       </aside>
 
       <main className="workspace">

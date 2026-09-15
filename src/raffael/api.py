@@ -215,7 +215,7 @@ def create_app(
             if runtime_auth is not None:
                 runtime_auth.close()
 
-    app = FastAPI(title="raffael", version="0.4.0", lifespan=lifespan)
+    app = FastAPI(title="raffael", version="0.6.0", lifespan=lifespan)
 
     @app.middleware("http")
     async def security_headers(request: Request, call_next):

@@ -24,7 +24,7 @@ def check_http(service: Service) -> CheckResult:
         raise ValueError("http check needs a url")
 
     started = perf_counter()
-    request = Request(service.url, headers={"User-Agent": "raffael/0.4"})
+    request = Request(service.url, headers={"User-Agent": "raffael/0.6"})
 
     try:
         with urlopen(request, timeout=service.timeout) as response:

@@ -17,6 +17,24 @@ you do not need a domain, a real mail account or a public server.
 
 ## start it
 
+the easiest path is the installer:
+
+```bash
+./scripts/install.sh
+```
+
+on windows, use powershell:
+
+```powershell
+.\scripts\install.ps1
+```
+
+it checks git, docker and docker compose, creates `.env` and `services.yaml`,
+then starts the containers. see `docs/installer.md` if it gets stuck on docker
+desktop first-run setup.
+
+manual path:
+
 ```bash
 git clone https://github.com/nothingwastakenalready/raffael.git
 cd raffael
