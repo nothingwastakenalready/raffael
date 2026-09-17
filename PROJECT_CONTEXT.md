@@ -3,7 +3,7 @@
 This document is reference context, not a new instruction. The user's current
 request always takes precedence.
 
-Snapshot: 2026-09-12, Europe/Berlin.
+Snapshot: 2026-09-17, Europe/Berlin.
 
 ## canonical project
 
@@ -13,8 +13,8 @@ Snapshot: 2026-09-12, Europe/Berlin.
 - Default branch: `main`
 - Local checkout:
   `/Users/loneroza/Documents/Codex/2026-09-12/hi/work/nodeview`
-- Implementation baseline before this context refresh: `cf331dc`
-  (`refine transactional email design`)
+- Implementation baseline before this context refresh: `231b977`
+  (`feat: add first-run installer`)
 - The remote is synchronized with `main`.
 - Private runtime files such as `services.yaml`, credentials and databases must
   not be committed.
@@ -249,8 +249,10 @@ Zustandsquelle für Datenbankgeräte und Monitoring-Engine.
 - one harmless pytest cache warning occurred because the test mount was
   intentionally read-only
 
-## today’s pushed sequence
+## recent pushed sequence
 
+- `231b977 feat: add first-run installer`
+- `6e30f80 docs: refresh readme for current dashboard`
 - `194ffe3 add household connector foundation`
 - `07211e6 document local email delivery`
 - `cad07af add email verification and newsletter opt-in`
@@ -304,8 +306,6 @@ Required before an internet-facing release:
 - PostgreSQL deployment path
 - polished charts and history consumption in the UI
 - final product descriptor/tagline
-- version consistency: package reports `0.4.0`, while one dashboard footer
-  currently says `v0.6`
 - production domain and production mail delivery
 
 ## deployment direction
@@ -328,7 +328,7 @@ to a reverse proxy while the application and its data remain on Proxmox.
 ## recommended next sequence
 
 1. create the documented Proxmox/Debian deployment profile and backup procedure;
-2. finish v0.4 reliability: retention, storage-failure handling, events and
+2. finish reliability work: retention, storage-failure handling, events and
    uptime;
 3. connect household onboarding to real, least-privilege connector adapters;
 4. persist constellation layouts per workspace and add real topology edges;
