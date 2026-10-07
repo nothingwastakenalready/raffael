@@ -6,7 +6,7 @@ from fastapi.testclient import TestClient
 from raffael.api import create_app
 from raffael.checks import CheckResult
 from raffael.config import Service
-from raffael.engine import MonitoringEngine
+from raffael.engine import MonitoringEngine, ServiceState
 from raffael.history import Measurement
 from raffael.client_sources import ImportedClient
 
@@ -397,6 +397,44 @@ def test_state_returns_engine_snapshot(tmp_path):
     assert response.json()[0]["status"] == "up"
     assert response.json()[0]["latency_ms"] == 9
     assert response.json()[0]["last_checked"].endswith("+00:00")
+
+
+def test_metrics_exports_prometheus_text_without_sensitive_targets(tmp_path):
+    config = tmp_path / "services.yaml"
+    config.write_text("services: []\n")
+
+    class FakeEngine:
+        def states(self):
+            return {
+                "42": ServiceState(
+                    name="Raffael API",
+                    status="up",
+                    latency_ms=9,
+                    http_status=200,
+                    last_checked=datetime(2026, 9, 13, 12, 0, tzinfo=timezone.utc),
+                    check_id=42,
+                    workspace_id=7,
+                    device_id=3,
+                    details={
+                        "check_type": "http",
+                        "target": "https://secret.example.com/health",
+                        "credential_ref": "keychain://raffael/api",
+                    },
+                )
+            }
+
+    client = TestClient(create_app(config_path=config, engine=FakeEngine()))
+    response = client.get("/metrics")
+    body = response.text
+
+    assert response.status_code == 200
+    assert response.headers["content-type"].startswith("text/plain")
+    assert 'raffael_check_state{check_id="42",check_name="Raffael API",check_type="http",status="up"} 1' in body
+    assert 'raffael_check_latency_ms{check_id="42",check_name="Raffael API",check_type="http"} 9' in body
+    assert 'raffael_check_last_success_timestamp_seconds{check_id="42",check_name="Raffael API",check_type="http"} 1789300800' in body
+    assert "secret.example.com" not in body
+    assert "workspace_id" not in body
+    assert "keychain://" not in body
 
 
 def test_lifespan_starts_and_stops_injected_engine(tmp_path):

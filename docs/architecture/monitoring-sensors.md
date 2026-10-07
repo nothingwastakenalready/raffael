@@ -27,6 +27,22 @@ every persisted sensor state can expose:
 the history table stores the same technical details so a restart does not erase
 the monitoring evidence.
 
+## prometheus export
+
+`GET /metrics` exposes the current scheduler state in Prometheus text format.
+the first export is intentionally small: state, last latency and last
+success/failure timestamps for active checks.
+
+metric labels are limited to stable check identity and type:
+
+- `check_id`
+- `check_name`
+- `check_type`
+- `status` on `raffael_check_state`
+
+targets, hosts, workspace ids, error messages, technical details and credential
+references are not exported as labels.
+
 ## current sensor types
 
 - `http` checks one http or https url.

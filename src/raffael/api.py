@@ -26,6 +26,7 @@ from .monitors import CheckStore, CompositeRecorder
 
 Checker = Callable[[Service], CheckResult]
 ClientSourceLoader = Callable[[], list[ImportedClient]]
+PROMETHEUS_TEXT = "text/plain; version=0.0.4; charset=utf-8"
 
 
 class ServiceInput(BaseModel):
@@ -143,6 +144,48 @@ def result_json(result: CheckResult) -> dict:
     data["type"] = data.pop("kind")
     data.pop("url", None)
     return data
+
+
+def prometheus_escape(value: object) -> str:
+    return str(value).replace("\\", "\\\\").replace("\n", "\\n").replace('"', '\\"')
+
+
+def prometheus_labels(state: object) -> tuple[str, str]:
+    data = asdict(state)
+    details = data.get("details") if isinstance(data.get("details"), dict) else {}
+    check_id = data.get("check_id")
+    labels = {
+        "check_id": str(check_id) if check_id is not None else data["name"],
+        "check_name": data["name"],
+        "check_type": details.get("check_type", "unknown"),
+    }
+    label_text = ",".join(f'{key}="{prometheus_escape(value)}"' for key, value in labels.items())
+    return label_text, data["status"]
+
+
+def prometheus_metrics(states: list[object]) -> str:
+    lines = [
+        "# HELP raffael_check_state Current check state as a labelled gauge.",
+        "# TYPE raffael_check_state gauge",
+        "# HELP raffael_check_latency_ms Last observed check latency in milliseconds.",
+        "# TYPE raffael_check_latency_ms gauge",
+        "# HELP raffael_check_last_success_timestamp_seconds Unix timestamp of the last successful check.",
+        "# TYPE raffael_check_last_success_timestamp_seconds gauge",
+        "# HELP raffael_check_last_failure_timestamp_seconds Unix timestamp of the last failed check.",
+        "# TYPE raffael_check_last_failure_timestamp_seconds gauge",
+    ]
+    for state in states:
+        data = asdict(state)
+        labels, status = prometheus_labels(state)
+        lines.append(f'raffael_check_state{{{labels},status="{prometheus_escape(status)}"}} 1')
+        if data["latency_ms"] is not None:
+            lines.append(f"raffael_check_latency_ms{{{labels}}} {data['latency_ms']}")
+        if data["last_checked"] is not None and status in {"up", "warning", "critical", "unknown"}:
+            checked_at = data["last_checked"]
+            timestamp = int(checked_at.timestamp())
+            metric = "success" if status == "up" else "failure"
+            lines.append(f"raffael_check_last_{metric}_timestamp_seconds{{{labels}}} {timestamp}")
+    return "\n".join(lines) + "\n"
 
 
 def create_app(
@@ -698,6 +741,11 @@ def create_app(
             _, workspace_id = current_workspace(session_token)
             return runtime_checks.states(workspace_id)
         return [asdict(item) for item in runtime_engine.states().values()]
+
+    @app.get("/metrics")
+    def metrics():
+        states = list(runtime_engine.states().values()) if runtime_engine is not None else []
+        return Response(prometheus_metrics(states), media_type=PROMETHEUS_TEXT)
 
     @app.get("/history/{service_name}")
     def service_history(

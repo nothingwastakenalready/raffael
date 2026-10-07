@@ -111,6 +111,7 @@ api is still there:
 GET  /health
 GET  /ready
 GET  /state
+GET  /metrics
 GET  /checks
 POST /checks
 PATCH /checks/{check_id}
@@ -128,8 +129,11 @@ POST /household/discover/adopt
 ```
 
 `/ready` checks database and scheduler readiness. `/state` shows the current
-workspace-filtered monitoring state. `/checks` manages stored sensors. the old
-raw `/check` endpoint only remains as a `410 gone` compatibility stub.
+workspace-filtered monitoring state. `/metrics` exposes the current scheduler
+state in Prometheus text format with stable check labels and without exporting
+targets, workspace ids, errors or credential references. `/checks` manages
+stored sensors. the old raw `/check` endpoint only remains as a `410 gone`
+compatibility stub.
 
 config is still deliberately boring:
 
